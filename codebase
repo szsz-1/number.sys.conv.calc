@@ -83,8 +83,7 @@ const NumberSystemConverter = () => {
   };
 
   const isButtonDisabled = (button) => {
-    if (['AC', '+', '-', '×', '÷', '%', '='].includes(button)) return false;
-    if (button === '00') return selectedBase === 'BIN';
+    if (['AC', '+', '-', '×', '÷', '%', '=', '0', '00'].includes(button)) return false;
     if (selectedBase === 'BIN' && !'01'.includes(button)) return true;
     if (selectedBase === 'OCT' && !'01234567'.includes(button)) return true;
     if (selectedBase === 'DEC' && !'0123456789'.includes(button)) return true;
