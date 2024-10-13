@@ -1,0 +1,215 @@
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+
+const NumberSystemConverter = () => {
+  const [currentValue, setCurrentValue] = useState('0');
+  const [previousValue, setPreviousValue] = useState(null);
+  const [currentBase, setCurrentBase] = useState(10);
+  const [selectedBase, setSelectedBase] = useState('DEC');
+  const [currentOperation, setCurrentOperation] = useState(null);
+  const [isNewInput, setIsNewInput] = useState(true);
+
+  const convertBase = (num, fromBase, toBase) => {
+    return parseInt(num.toString(), fromBase).toString(toBase).toUpperCase();
+  };
+
+  const updateDisplay = (value) => {
+    setCurrentValue(value);
+  };
+
+  const handleNumberPress = (num) => {
+    if (isNewInput) {
+      updateDisplay(num);
+      setIsNewInput(false);
+    } else {
+      if (num === '00' && currentValue === '0') {
+        return; // Prevent leading zeros
+      }
+      updateDisplay(currentValue + num);
+    }
+  };
+
+  const handleOperationPress = (operation) => {
+    if (operation === '=') {
+      calculateResult();
+    } else {
+      setCurrentOperation(operation);
+      setPreviousValue(currentValue);
+      setIsNewInput(true);
+    }
+  };
+
+  const calculateResult = () => {
+    if (previousValue === null || currentOperation === null) return;
+
+    const prev = parseInt(previousValue, currentBase);
+    const current = parseInt(currentValue, currentBase);
+    let result;
+
+    switch (currentOperation) {
+      case '+':
+        result = prev + current;
+        break;
+      case '-':
+        result = prev - current;
+        break;
+      case '×':
+        result = prev * current;
+        break;
+      case '÷':
+        result = prev / current;
+        break;
+      default:
+        return;
+    }
+
+    updateDisplay(convertBase(result, 10, currentBase));
+    setPreviousValue(null);
+    setCurrentOperation(null);
+    setIsNewInput(true);
+  };
+
+  const handleBaseChange = (base, baseStr) => {
+    const newValue = convertBase(currentValue, currentBase, base);
+    setCurrentBase(base);
+    setCurrentValue(newValue);
+    setSelectedBase(baseStr);
+  };
+
+  const handleClear = () => {
+    setCurrentValue('0');
+    setPreviousValue(null);
+    setCurrentOperation(null);
+    setIsNewInput(true);
+  };
+
+  const isButtonDisabled = (button) => {
+    if (['AC', '+', '-', '×', '÷', '%', '=', '0', '00'].includes(button)) return false;
+    if (selectedBase === 'BIN' && !'01'.includes(button)) return true;
+    if (selectedBase === 'OCT' && !'01234567'.includes(button)) return true;
+    if (selectedBase === 'DEC' && !'0123456789'.includes(button)) return true;
+    return false;
+  };
+
+  const renderButton = (label, onPress, color = '#4B5563') => {
+    const isDisabled = isButtonDisabled(label);
+    return (
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: isDisabled ? 'gray' : color }]}
+        onPress={isDisabled ? null : onPress}
+        disabled={isDisabled}
+      >
+        <Text style={styles.buttonText}>{label}</Text>
+      </TouchableOpacity>
+    );
+  };
+
+  const renderBaseDisplay = (label, value, baseNum, baseStr) => (
+    <TouchableOpacity
+      style={[styles.baseDisplay, selectedBase === baseStr ? styles.selectedBase : null]}
+      onPress={() => handleBaseChange(baseNum, baseStr)}
+    >
+      <Text style={styles.baseText}>{label} {value}</Text>
+    </TouchableOpacity>
+  );
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.baseContainer}>
+        {renderBaseDisplay('HEX', convertBase(currentValue, currentBase, 16), 16, 'HEX')}
+        {renderBaseDisplay('DEC', convertBase(currentValue, currentBase, 10), 10, 'DEC')}
+        {renderBaseDisplay('OCT', convertBase(currentValue, currentBase, 8), 8, 'OCT')}
+        {renderBaseDisplay('BIN', convertBase(currentValue, currentBase, 2), 2, 'BIN')}
+      </View>
+      <View style={styles.buttonContainer}>
+        <View style={styles.row}>
+          {renderButton('D', () => handleNumberPress('D'))}
+          {renderButton('E', () => handleNumberPress('E'))}
+          {renderButton('F', () => handleNumberPress('F'))}
+          {renderButton('AC', handleClear, '#F59E0B')}
+        </View>
+        <View style={styles.row}>
+          {renderButton('A', () => handleNumberPress('A'))}
+          {renderButton('B', () => handleNumberPress('B'))}
+          {renderButton('C', () => handleNumberPress('C'))}
+          {renderButton('÷', () => handleOperationPress('÷'), '#F59E0B')}
+        </View>
+        <View style={styles.row}>
+          {renderButton('7', () => handleNumberPress('7'))}
+          {renderButton('8', () => handleNumberPress('8'))}
+          {renderButton('9', () => handleNumberPress('9'))}
+          {renderButton('×', () => handleOperationPress('×'), '#F59E0B')}
+        </View>
+        <View style={styles.row}>
+          {renderButton('4', () => handleNumberPress('4'))}
+          {renderButton('5', () => handleNumberPress('5'))}
+          {renderButton('6', () => handleNumberPress('6'))}
+          {renderButton('-', () => handleOperationPress('-'), '#F59E0B')}
+        </View>
+        <View style={styles.row}>
+          {renderButton('1', () => handleNumberPress('1'))}
+          {renderButton('2', () => handleNumberPress('2'))}
+          {renderButton('3', () => handleNumberPress('3'))}
+          {renderButton('+', () => handleOperationPress('+'), '#F59E0B')}
+        </View>
+        <View style={styles.row}>
+          {renderButton('0', () => handleNumberPress('0'))}
+          {renderButton('00', () => handleNumberPress('00'))}
+          {renderButton('%', () => handleOperationPress('%'))}
+          {renderButton('=', () => handleOperationPress('='), '#F59E0B')}
+        </View>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#000',
+    padding: 20,
+  },
+  baseContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+  },
+  baseDisplay: {
+    backgroundColor: '#4B5563',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
+    width: '100%',
+    alignItems: 'flex-end',
+  },
+  selectedBase: {
+    backgroundColor: '#1F2937',
+  },
+  baseText: {
+    color: '#FFF',
+    fontSize: 24,
+  },
+  buttonContainer: {
+    flex: 2,
+    justifyContent: 'flex-end',
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 15,
+  },
+  button: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#FFF',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+});
+
+export default NumberSystemConverter;
