@@ -1,0 +1,166 @@
+import React, { useState } from 'react';
+
+const NumberSystemConverter = () => {
+  const [currentValue, setCurrentValue] = useState('0');
+  const [previousValue, setPreviousValue] = useState(null);
+  const [currentBase, setCurrentBase] = useState(10);
+  const [selectedBase, setSelectedBase] = useState('DEC');
+  const [currentOperation, setCurrentOperation] = useState(null);
+  const [isNewInput, setIsNewInput] = useState(true);
+
+  const convertBase = (num, fromBase, toBase) => {
+    return parseInt(num.toString(), fromBase).toString(toBase).toUpperCase();
+  };
+
+  const updateDisplay = (value) => {
+    setCurrentValue(value);
+  };
+
+  const handleNumberPress = (num) => {
+    if (isNewInput) {
+      updateDisplay(num);
+      setIsNewInput(false);
+    } else {
+      if (num === '00' && currentValue === '0') {
+        return; // Prevent leading zeros
+      }
+      updateDisplay(currentValue + num);
+    }
+  };
+
+  const handleOperationPress = (operation) => {
+    if (operation === '=') {
+      calculateResult();
+    } else {
+      setCurrentOperation(operation);
+      setPreviousValue(currentValue);
+      setIsNewInput(true);
+    }
+  };
+
+  const calculateResult = () => {
+    if (previousValue === null || currentOperation === null) return;
+
+    const prev = parseInt(previousValue, currentBase);
+    const current = parseInt(currentValue, currentBase);
+    let result;
+
+    switch (currentOperation) {
+      case '+':
+        result = prev + current;
+        break;
+      case '-':
+        result = prev - current;
+        break;
+      case '×':
+        result = prev * current;
+        break;
+      case '÷':
+        result = prev / current;
+        break;
+      default:
+        return;
+    }
+
+    updateDisplay(convertBase(result, 10, currentBase));
+    setPreviousValue(null);
+    setCurrentOperation(null);
+    setIsNewInput(true);
+  };
+
+  const handleBaseChange = (base, baseStr) => {
+    const newValue = convertBase(currentValue, currentBase, base);
+    setCurrentBase(base);
+    setCurrentValue(newValue);
+    setSelectedBase(baseStr);
+  };
+
+  const handleClear = () => {
+    setCurrentValue('0');
+    setPreviousValue(null);
+    setCurrentOperation(null);
+    setIsNewInput(true);
+  };
+
+  const isButtonDisabled = (button) => {
+    if (['AC', '+', '-', '×', '÷', '%', '='].includes(button)) return false;
+    if (button === '00') return selectedBase === 'BIN';
+    if (selectedBase === 'BIN' && !'01'.includes(button)) return true;
+    if (selectedBase === 'OCT' && !'01234567'.includes(button)) return true;
+    if (selectedBase === 'DEC' && !'0123456789'.includes(button)) return true;
+    return false;
+  };
+
+  const renderButton = (label, onPress, color = 'bg-gray-700') => {
+    const isDisabled = isButtonDisabled(label);
+    return (
+      <button
+        className={`w-16 h-16 rounded-full ${color} ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'text-white'} text-2xl font-bold focus:outline-none`}
+        onClick={isDisabled ? null : onPress}
+        disabled={isDisabled}
+      >
+        {label}
+      </button>
+    );
+  };
+
+  const renderBaseDisplay = (label, value, baseNum, baseStr) => (
+    <div 
+      className={`text-white text-2xl mb-2 p-2 rounded cursor-pointer ${selectedBase === baseStr ? 'bg-gray-700' : 'opacity-50'}`}
+      onClick={() => handleBaseChange(baseNum, baseStr)}
+    >
+      {label} {value}
+    </div>
+  );
+
+  return (
+    <div className="flex flex-col h-screen bg-black p-4">
+      <div className="flex-1 flex flex-col justify-end items-end">
+        {renderBaseDisplay('HEX', convertBase(currentValue, currentBase, 16), 16, 'HEX')}
+        {renderBaseDisplay('DEC', convertBase(currentValue, currentBase, 10), 10, 'DEC')}
+        {renderBaseDisplay('OCT', convertBase(currentValue, currentBase, 8), 8, 'OCT')}
+        {renderBaseDisplay('BIN', convertBase(currentValue, currentBase, 2), 2, 'BIN')}
+      </div>
+      <div className="flex-2">
+        <div className="grid grid-cols-4 gap-4 mb-4">
+          {renderButton('D', () => handleNumberPress('D'))}
+          {renderButton('E', () => handleNumberPress('E'))}
+          {renderButton('F', () => handleNumberPress('F'))}
+          {renderButton('AC', handleClear, 'bg-orange-500')}
+        </div>
+        <div className="grid grid-cols-4 gap-4 mb-4">
+          {renderButton('A', () => handleNumberPress('A'))}
+          {renderButton('B', () => handleNumberPress('B'))}
+          {renderButton('C', () => handleNumberPress('C'))}
+          {renderButton('÷', () => handleOperationPress('÷'), 'bg-orange-500')}
+        </div>
+        <div className="grid grid-cols-4 gap-4 mb-4">
+          {renderButton('7', () => handleNumberPress('7'))}
+          {renderButton('8', () => handleNumberPress('8'))}
+          {renderButton('9', () => handleNumberPress('9'))}
+          {renderButton('×', () => handleOperationPress('×'), 'bg-orange-500')}
+        </div>
+        <div className="grid grid-cols-4 gap-4 mb-4">
+          {renderButton('4', () => handleNumberPress('4'))}
+          {renderButton('5', () => handleNumberPress('5'))}
+          {renderButton('6', () => handleNumberPress('6'))}
+          {renderButton('-', () => handleOperationPress('-'), 'bg-orange-500')}
+        </div>
+        <div className="grid grid-cols-4 gap-4 mb-4">
+          {renderButton('1', () => handleNumberPress('1'))}
+          {renderButton('2', () => handleNumberPress('2'))}
+          {renderButton('3', () => handleNumberPress('3'))}
+          {renderButton('+', () => handleOperationPress('+'), 'bg-orange-500')}
+        </div>
+        <div className="grid grid-cols-4 gap-4">
+          {renderButton('0', () => handleNumberPress('0'))}
+          {renderButton('00', () => handleNumberPress('00'))}
+          {renderButton('%', () => handleOperationPress('%'))}
+          {renderButton('=', () => handleOperationPress('='), 'bg-orange-500')}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default NumberSystemConverter;
