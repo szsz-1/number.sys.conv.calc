@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+} from 'react-native';
 
 const NumberSystemConverter = () => {
   const [currentValue, setCurrentValue] = useState('0');
@@ -11,15 +17,15 @@ const NumberSystemConverter = () => {
   const convertBase = (num, fromBase, toBase) => {
     // First, ensure the number is a string
     const numStr = num.toString();
-    
+
     // Convert from the original base to decimal
     const decimal = parseInt(numStr, fromBase);
-    
+
     // If the conversion to decimal failed, return '0'
     if (isNaN(decimal)) {
       return '0';
     }
-    
+
     // Convert from decimal to the target base
     return decimal.toString(toBase).toUpperCase();
   };
@@ -47,7 +53,7 @@ const NumberSystemConverter = () => {
     // Convert previous and current values to decimal for calculation
     const prevDecimal = parseInt(previousValue, currentBase);
     const currDecimal = parseInt(currentValue, currentBase);
-    
+
     let resultDecimal;
 
     // Perform the operation based on the selected operation
@@ -87,7 +93,8 @@ const NumberSystemConverter = () => {
   };
 
   const isButtonDisabled = (button) => {
-    if (['AC', '+', '-', '×', '÷', '%', '=', '0', '00'].includes(button)) return false;
+    if (['AC', '+', '-', '×', '÷', '%', '=', '0', '00'].includes(button))
+      return false;
     if (selectedBase === 'BIN' && !'01'.includes(button)) return true;
     if (selectedBase === 'OCT' && !'01234567'.includes(button)) return true;
     if (selectedBase === 'DEC' && !'0123456789'.includes(button)) return true;
@@ -98,10 +105,9 @@ const NumberSystemConverter = () => {
     <TouchableOpacity
       style={[
         styles.baseDisplay,
-        selectedBase === baseStr && styles.selectedBaseDisplay
+        selectedBase === baseStr && styles.selectedBaseDisplay,
       ]}
-      onPress={() => handleBaseChange(baseNum, baseStr)}
-    >
+      onPress={() => handleBaseChange(baseNum, baseStr)}>
       <Text style={styles.baseLabel}>{label}</Text>
       <Text style={styles.baseValue}>{value}</Text>
     </TouchableOpacity>
@@ -113,9 +119,12 @@ const NumberSystemConverter = () => {
       <TouchableOpacity
         style={[styles.button, color, isDisabled && styles.disabledButton]}
         onPress={isDisabled ? null : onPress}
-        disabled={isDisabled}
-      >
-        <Text style={[styles.buttonText, color === styles.orangeButton && styles.orangeButtonText]}>
+        disabled={isDisabled}>
+        <Text
+          style={[
+            styles.buttonText,
+            color === styles.orangeButton && styles.orangeButtonText,
+          ]}>
           {label}
         </Text>
       </TouchableOpacity>
@@ -125,10 +134,30 @@ const NumberSystemConverter = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.displayContainer}>
-        {renderBaseDisplay('HEX', convertBase(currentValue, currentBase, 16), 16, 'HEX')}
-        {renderBaseDisplay('DEC', convertBase(currentValue, currentBase, 10), 10, 'DEC')}
-        {renderBaseDisplay('OCT', convertBase(currentValue, currentBase, 8), 8, 'OCT')}
-        {renderBaseDisplay('BIN', convertBase(currentValue, currentBase, 2), 2, 'BIN')}
+        {renderBaseDisplay(
+          'HEX',
+          convertBase(currentValue, currentBase, 16),
+          16,
+          'HEX'
+        )}
+        {renderBaseDisplay(
+          'DEC',
+          convertBase(currentValue, currentBase, 10),
+          10,
+          'DEC'
+        )}
+        {renderBaseDisplay(
+          'OCT',
+          convertBase(currentValue, currentBase, 8),
+          8,
+          'OCT'
+        )}
+        {renderBaseDisplay(
+          'BIN',
+          convertBase(currentValue, currentBase, 2),
+          2,
+          'BIN'
+        )}
       </View>
       <View style={styles.buttonContainer}>
         <View style={styles.row}>
@@ -141,25 +170,41 @@ const NumberSystemConverter = () => {
           {renderButton('A', () => handleNumberPress('A'))}
           {renderButton('B', () => handleNumberPress('B'))}
           {renderButton('C', () => handleNumberPress('C'))}
-          {renderButton('÷', () => handleOperationPress('÷'), styles.orangeButton)}
+          {renderButton(
+            '÷',
+            () => handleOperationPress('÷'),
+            styles.orangeButton
+          )}
         </View>
         <View style={styles.row}>
           {renderButton('7', () => handleNumberPress('7'))}
           {renderButton('8', () => handleNumberPress('8'))}
           {renderButton('9', () => handleNumberPress('9'))}
-          {renderButton('×', () => handleOperationPress('×'), styles.orangeButton)}
+          {renderButton(
+            '×',
+            () => handleOperationPress('×'),
+            styles.orangeButton
+          )}
         </View>
         <View style={styles.row}>
           {renderButton('4', () => handleNumberPress('4'))}
           {renderButton('5', () => handleNumberPress('5'))}
           {renderButton('6', () => handleNumberPress('6'))}
-          {renderButton('-', () => handleOperationPress('-'), styles.orangeButton)}
+          {renderButton(
+            '-',
+            () => handleOperationPress('-'),
+            styles.orangeButton
+          )}
         </View>
         <View style={styles.row}>
           {renderButton('1', () => handleNumberPress('1'))}
           {renderButton('2', () => handleNumberPress('2'))}
           {renderButton('3', () => handleNumberPress('3'))}
-          {renderButton('+', () => handleOperationPress('+'), styles.orangeButton)}
+          {renderButton(
+            '+',
+            () => handleOperationPress('+'),
+            styles.orangeButton
+          )}
         </View>
         <View style={styles.row}>
           {renderButton('0', () => handleNumberPress('0'))}
