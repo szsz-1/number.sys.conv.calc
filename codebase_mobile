@@ -93,7 +93,7 @@ const NumberSystemConverter = () => {
   };
 
   const isButtonDisabled = (button) => {
-    if (['AC', '+', '-', '×', '÷', '%', '=', '0', '00'].includes(button))
+    if (['AC', '+', '-', '×', '÷', '=', '0', '00'].includes(button))
       return false;
     if (selectedBase === 'BIN' && !'01'.includes(button)) return true;
     if (selectedBase === 'OCT' && !'01234567'.includes(button)) return true;
@@ -115,18 +115,18 @@ const NumberSystemConverter = () => {
 
   const renderButton = (label, onPress, color = styles.darkButton) => {
     const isDisabled = isButtonDisabled(label);
+    const buttonStyle = label === 'AC' ? styles.redOrangeButton : color;
+    const textStyle = label === 'AC' ? styles.redOrangeButtonText : [
+      styles.buttonText,
+      color === styles.orangeButton && styles.orangeButtonText,
+    ];
+
     return (
       <TouchableOpacity
-        style={[styles.button, color, isDisabled && styles.disabledButton]}
+        style={[styles.button, buttonStyle, isDisabled && styles.disabledButton]}
         onPress={isDisabled ? null : onPress}
         disabled={isDisabled}>
-        <Text
-          style={[
-            styles.buttonText,
-            color === styles.orangeButton && styles.orangeButtonText,
-          ]}>
-          {label}
-        </Text>
+        <Text style={textStyle}>{label}</Text>
       </TouchableOpacity>
     );
   };
@@ -164,7 +164,7 @@ const NumberSystemConverter = () => {
           {renderButton('D', () => handleNumberPress('D'))}
           {renderButton('E', () => handleNumberPress('E'))}
           {renderButton('F', () => handleNumberPress('F'))}
-          {renderButton('AC', handleClear, styles.orangeButton)}
+          {renderButton('AC', handleClear)}
         </View>
         <View style={styles.row}>
           {renderButton('A', () => handleNumberPress('A'))}
@@ -209,7 +209,6 @@ const NumberSystemConverter = () => {
         <View style={styles.row}>
           {renderButton('0', () => handleNumberPress('0'))}
           {renderButton('00', () => handleNumberPress('00'))}
-          {renderButton('%', () => handleOperationPress('%'))}
           {renderButton('=', handleEqualsPress, styles.orangeButton)}
         </View>
       </View>
@@ -268,6 +267,9 @@ const styles = StyleSheet.create({
   orangeButton: {
     backgroundColor: '#FF9500',
   },
+  redOrangeButton: {
+    backgroundColor: '#FF0000', // Changed to a brighter, more pure red
+  },
   buttonText: {
     color: 'white',
     fontSize: 24,
@@ -275,6 +277,11 @@ const styles = StyleSheet.create({
   },
   orangeButtonText: {
     color: 'black',
+  },
+  redOrangeButtonText: {
+    color: 'black',
+    fontSize: 24,
+    fontWeight: 'bold',
   },
   disabledButton: {
     opacity: 0.3,
